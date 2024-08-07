@@ -12,7 +12,8 @@ const pageApp = {
         const thisPageApp = this;
 
         // thisPageApp.initReviews();
-        thisPageApp.initSlider();
+        // thisPageApp.initSlider();
+        thisPageApp.initAccordion();
 
 
     },
@@ -26,13 +27,45 @@ const pageApp = {
         document.querySelector('.slider').addEventListener('input', (e) => {
             e.preventDefault();
             console.log('e.target.value', e.target.value);
-            sliderBoxContainer.style.setProperty('--position', `${e.target.value}`);
+            sliderBoxContainer.style.setProperty('--position', `${e.target.value}%`);
 
             
 
         });
 
     },
+
+    initAccordion: function() {
+    
+        /* find the clickable trigger (the element that should react to clicking) */
+        const clickableTriggers = document.querySelectorAll(".accordion");
+    
+        for (let accordion of clickableTriggers) {
+            /* START: add event listener to clickable trigger on event click */
+            accordion.addEventListener('click', function(event) {
+            /* prevent default action for event */
+            event.preventDefault();
+
+            /* find active product (product that has active class) */
+            const activeProduct = document.querySelector(".accordion.active");
+
+            if(activeProduct){
+
+            /* if there is active product and it's not thisProduct.element, remove class active from it */
+            if(activeProduct != accordion){
+                activeProduct.classList.remove("active");
+            }
+
+            }
+
+            /* toggle active class on thisProduct.element */
+            accordion.classList.toggle("active");
+
+        });
+        }
+
+        
+    }
 
     //     initReviews: function() {
 
