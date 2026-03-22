@@ -13,6 +13,7 @@ const pageApp = {
 
         // thisPageApp.initReviews();
         // thisPageApp.initSlider();
+        thisPageApp.initSlideShow();
         thisPageApp.initAccordion();
 
 
@@ -33,6 +34,28 @@ const pageApp = {
 
         });
 
+    },
+
+    initSlideShow: function() {
+
+        const slideShowTrack = document.querySelector('.slide-show-track');
+
+        if (!slideShowTrack) {
+            return;
+        }
+
+        const slideShowPages = slideShowTrack.querySelectorAll('.slide-show-page');
+
+        if (slideShowPages.length <= 1) {
+            return;
+        }
+
+        let currentPage = 0;
+
+        setInterval(() => {
+            currentPage = (currentPage + 1) % slideShowPages.length;
+            slideShowTrack.style.transform = `translateX(-${currentPage * 100}%)`;
+        }, 7000);
     },
 
     initAccordion: function() {
