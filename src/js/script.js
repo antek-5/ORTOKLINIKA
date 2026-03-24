@@ -50,12 +50,35 @@ const pageApp = {
             return;
         }
 
+        const firstSlideClone = slideShowPages[0].cloneNode(true);
+        slideShowTrack.appendChild(firstSlideClone);
+
+        const slideCount = slideShowPages.length;
+        const slideDurationMs = 7000;
+        const slideTransition = 'transform 0.8s ease';
         let currentPage = 0;
 
+        slideShowTrack.style.transition = slideTransition;
+
         setInterval(() => {
-            currentPage = (currentPage + 1) % slideShowPages.length;
+            currentPage += 1;
             slideShowTrack.style.transform = `translateX(-${currentPage * 100}%)`;
-        }, 7000);
+        }, slideDurationMs);
+
+        slideShowTrack.addEventListener('transitionend', () => {
+            if (currentPage !== slideCount) {
+                return;
+            }
+
+            // After animating to the cloned first slide, jump back to real first slide without animation.
+            slideShowTrack.style.transition = 'none';
+            currentPage = 0;
+            slideShowTrack.style.transform = 'translateX(0%)';
+
+            // Force reflow so the browser applies the non-animated position before restoring transition.
+            slideShowTrack.offsetHeight;
+            slideShowTrack.style.transition = slideTransition;
+        });
     },
 
     initAccordion: function() {
