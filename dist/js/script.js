@@ -14,6 +14,7 @@ const pageApp = {
         // thisPageApp.initReviews();
         // thisPageApp.initSlider();
         thisPageApp.initSlideShow();
+        thisPageApp.initManualSlideShow();
         thisPageApp.initAccordion();
 
 
@@ -40,20 +41,19 @@ const pageApp = {
 
         const slideShowTrack = document.querySelector('.slide-show-track');
 
+
         if (!slideShowTrack) {
             return;
         }
 
         const slideShowPages = slideShowTrack.querySelectorAll('.slide-show-page');
 
-        if (slideShowPages.length <= 1) {
+        if (slideShowPages.length <= 2) {
             return;
         }
 
-        const firstSlideClone = slideShowPages[0].cloneNode(true);
-        slideShowTrack.appendChild(firstSlideClone);
-
-        const slideCount = slideShowPages.length;
+        // Last slide is a copy of the first slide added in HTML.
+        const copiedFirstSlideIndex = slideShowPages.length - 1;
         const slideDurationMs = 7000;
         const slideTransition = 'transform 0.8s ease';
         let currentPage = 0;
@@ -66,11 +66,11 @@ const pageApp = {
         }, slideDurationMs);
 
         slideShowTrack.addEventListener('transitionend', () => {
-            if (currentPage !== slideCount) {
+            if (currentPage !== copiedFirstSlideIndex) {
                 return;
             }
 
-            // After animating to the cloned first slide, jump back to real first slide without animation.
+            // After animating to copied first slide, jump to real first slide with no animation.
             slideShowTrack.style.transition = 'none';
             currentPage = 0;
             slideShowTrack.style.transform = 'translateX(0%)';
@@ -78,6 +78,82 @@ const pageApp = {
             // Force reflow so the browser applies the non-animated position before restoring transition.
             slideShowTrack.offsetHeight;
             slideShowTrack.style.transition = slideTransition;
+        });
+    },
+
+    initManualSlideShow: function() {
+
+        const manualSlideShow = document.querySelector('.manual-slide-show');
+
+        if (!manualSlideShow) {
+            return;
+        }
+
+        const slideShowTrack = manualSlideShow.querySelector('.manual-slide-show-track');
+        const slideShowPages = manualSlideShow.querySelectorAll('.manual-slide-show-page');
+        const previousButton = manualSlideShow.querySelector('.manual-slide-show-prev');
+        const nextButton = manualSlideShow.querySelector('.manual-slide-show-next');
+
+        if (!slideShowTrack || slideShowPages.length <= 1 || !previousButton || !nextButton) {
+            return;
+        }
+
+        const pageCount = slideShowPages.length;
+        const transitionValue = 'transform 0.5s ease';
+        const firstClone = slideShowPages[0].cloneNode(true);
+        const lastClone = slideShowPages[pageCount - 1].cloneNode(true);
+        let currentPage = 1;
+        let isAnimating = false;
+
+        slideShowTrack.insertBefore(lastClone, slideShowPages[0]);
+        slideShowTrack.appendChild(firstClone);
+        slideShowTrack.style.transition = 'none';
+        slideShowTrack.style.transform = `translateX(-${currentPage * 100}%)`;
+        slideShowTrack.offsetHeight;
+        slideShowTrack.style.transition = transitionValue;
+
+        const showCurrentPage = () => {
+            slideShowTrack.style.transform = `translateX(-${currentPage * 100}%)`;
+        };
+
+        previousButton.addEventListener('click', () => {
+            if (isAnimating) {
+                return;
+            }
+
+            isAnimating = true;
+            currentPage -= 1;
+            showCurrentPage();
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (isAnimating) {
+                return;
+            }
+
+            isAnimating = true;
+            currentPage += 1;
+            showCurrentPage();
+        });
+
+        slideShowTrack.addEventListener('transitionend', () => {
+            if (currentPage === 0) {
+                slideShowTrack.style.transition = 'none';
+                currentPage = pageCount;
+                showCurrentPage();
+                slideShowTrack.offsetHeight;
+                slideShowTrack.style.transition = transitionValue;
+            }
+
+            if (currentPage === pageCount + 1) {
+                slideShowTrack.style.transition = 'none';
+                currentPage = 1;
+                showCurrentPage();
+                slideShowTrack.offsetHeight;
+                slideShowTrack.style.transition = transitionValue;
+            }
+
+            isAnimating = false;
         });
     },
 

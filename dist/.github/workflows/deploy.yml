@@ -1,0 +1,24 @@
+name: Deploy website via FTP
+
+on:
+  push:
+    branches:
+      - main   # or master if your repo uses that
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Upload files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: server2508487.home.pl
+          username: server2508487
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: public_html/
